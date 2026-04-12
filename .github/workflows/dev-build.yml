@@ -1,0 +1,22 @@
+name: Dev Build
+on:
+  push:
+    branches: [dev]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Build exe
+        run: pyinstaller --onefile --windowed --name QuizLock src/main.py
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuizLock-dev-${{ github.run_number }}
+          path: dist/QuizLock.exe
+          retention-days: 7
