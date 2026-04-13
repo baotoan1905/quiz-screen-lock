@@ -238,6 +238,8 @@ class QuizLockApp:
                     "QuizLock",
                     f"Could not update Windows startup setting: {exc}",
                 )
+            if dlg.lock_now_requested:
+                self._manager.lock_now()
 
     def _on_quit(self) -> None:
         if self._manager.is_locked:

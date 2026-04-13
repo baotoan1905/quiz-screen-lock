@@ -50,6 +50,7 @@ class AdminPanel(QDialog):
     def __init__(self, config: Config, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self._config = config
+        self._lock_now_requested = False
         self.setWindowTitle("QuizLock — Admin Settings")
         self.setMinimumWidth(460)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowType.WindowContextHelpButtonHint)
@@ -103,6 +104,10 @@ class AdminPanel(QDialog):
         self._start_windows_cb = QCheckBox("Start QuizLock when Windows starts")
         form_misc.addRow(self._start_windows_cb)
 
+        self._lock_now_btn = QPushButton("Lock Screen Now")
+        self._lock_now_btn.clicked.connect(self._request_lock_now)
+        form_misc.addRow(self._lock_now_btn)
+
         root.addWidget(grp_misc)
 
         # --- Change password --------------------------------------------
@@ -145,6 +150,14 @@ class AdminPanel(QDialog):
         self._config.start_with_windows = self._start_windows_cb.isChecked()
         self._config.save()
         self.accept()
+
+    @property
+    def lock_now_requested(self) -> bool:
+        return self._lock_now_requested
+
+    def _request_lock_now(self) -> None:
+        self._save_and_accept()
+        self._lock_now_requested = True
 
     def _change_password(self) -> None:
         old_pw, ok = QInputDialog.getText(
