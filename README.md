@@ -57,11 +57,11 @@ QuizLock sits in the system tray and counts down the child's daily screen-time b
 ```bat
 git clone https://github.com/baotoan1905/quiz-screen-lock.git
 cd quiz-screen-lock
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 python src/main.py
 ```
 
-QuizLock will appear in the system tray. Right-click the tray icon to access settings.
+QuizLock runs in the **system tray** (no main window opens). If you do not see it right away, click the Windows hidden-icons arrow near the clock and look for the **Q** icon, then right-click it for settings.
 
 ---
 

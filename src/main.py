@@ -196,6 +196,12 @@ class QuizLockApp:
 
     # ------------------------------------------------------------------
     def run(self) -> int:
+        self._tray.showMessage(
+            "QuizLock",
+            "QuizLock is running in the system tray.",
+            QSystemTrayIcon.MessageIcon.Information,
+            2500,
+        )
         if self._config.lock_on_startup:
             QTimer.singleShot(500, self._manager.lock_now)
         self._manager.start()
