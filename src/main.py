@@ -127,8 +127,8 @@ class ScreenTimeManager:
 
 # ---------------------------------------------------------------------------
 class QuizLockApp:
-    def __init__(self) -> None:
-        self._app = QApplication(sys.argv)
+    def __init__(self, app: QApplication) -> None:
+        self._app = app
         self._app.setQuitOnLastWindowClosed(False)
         self._config = Config()
 
@@ -210,15 +210,15 @@ class QuizLockApp:
 
 # ---------------------------------------------------------------------------
 def main() -> None:
+    app = QApplication(sys.argv)
     if not QSystemTrayIcon.isSystemTrayAvailable():
-        app = QApplication(sys.argv)
         QMessageBox.critical(
             None,
             "QuizLock",
             "No system tray detected. QuizLock requires a system tray.",
         )
         sys.exit(1)
-    ql = QuizLockApp()
+    ql = QuizLockApp(app)
     sys.exit(ql.run())
 
 

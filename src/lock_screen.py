@@ -34,6 +34,7 @@ class LockScreen(QWidget):
     def __init__(self, config: Config, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self._config = config
+        self._secondary_blockers: list[QWidget] = []
         self._setup_window()
         self._setup_ui()
 
@@ -47,9 +48,36 @@ class LockScreen(QWidget):
         )
         self.setWindowFlags(flags)
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, False)
-        # Cover the entire virtual desktop (all monitors)
-        desktop = QApplication.primaryScreen().virtualGeometry()
-        self.setGeometry(desktop)
+        # Main quiz window is shown on the primary monitor.
+        primary = QApplication.primaryScreen()
+        if primary is not None:
+            self.setGeometry(primary.geometry())
+
+    def _clear_secondary_blockers(self) -> None:
+        for blocker in self._secondary_blockers:
+            blocker.hide()
+            blocker.deleteLater()
+        self._secondary_blockers.clear()
+
+    def _show_secondary_blockers(self) -> None:
+        self._clear_secondary_blockers()
+        primary = QApplication.primaryScreen()
+        for screen in QApplication.screens():
+            if screen == primary:
+                continue
+            blocker = QWidget()
+            blocker.setWindowTitle("QuizLock")
+            blocker.setWindowFlags(
+                Qt.WindowType.FramelessWindowHint
+                | Qt.WindowType.WindowStaysOnTopHint
+                | Qt.WindowType.Tool
+            )
+            blocker.setStyleSheet("background-color: rgb(15, 20, 40);")
+            blocker.setGeometry(screen.geometry())
+            blocker.show()
+            blocker.raise_()
+            blocker.activateWindow()
+            self._secondary_blockers.append(blocker)
 
     def _setup_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -106,9 +134,10 @@ class LockScreen(QWidget):
         """Display the lock screen and install keyboard hook."""
         self._quiz.reset()
         keyboard_hook.lock()
-        # Re-cover all monitors in case resolution changed
-        desktop = QApplication.primaryScreen().virtualGeometry()
-        self.setGeometry(desktop)
+        self._show_secondary_blockers()
+        primary = QApplication.primaryScreen()
+        if primary is not None:
+            self.setGeometry(primary.geometry())
         self.showFullScreen()
         self.raise_()
         self.activateWindow()
@@ -116,4 +145,5 @@ class LockScreen(QWidget):
     def _on_quiz_passed(self, minutes: int) -> None:
         keyboard_hook.unlock()
         self.hide()
+        self._clear_secondary_blockers()
         self.unlocked.emit(minutes)
