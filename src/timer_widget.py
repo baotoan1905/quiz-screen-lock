@@ -94,6 +94,10 @@ class TimerWidget(QWidget):
         self._remaining_seconds = max(0, self._remaining_seconds + seconds)
         self._refresh_label()
 
+    @property
+    def remaining_seconds(self) -> int:
+        return self._remaining_seconds
+
     def start(self) -> None:
         if not self._running:
             self._running = True

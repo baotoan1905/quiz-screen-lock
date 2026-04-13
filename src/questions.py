@@ -51,6 +51,12 @@ QUESTIONS: dict[str, list[dict]] = {
          "choices": ["A. Sunday", "B. Wednesday", "C. Tuesday", "D. Thursday"], "answer": "C", "subject": "Language"},
         {"question": "How many months are in a year?",
          "choices": ["A. 10", "B. 11", "C. 12", "D. 13"], "answer": "C", "subject": "Math"},
+        {"question": "Which shape has exactly 3 corners?",
+         "choices": ["A. Circle", "B. Triangle", "C. Square", "D. Oval"], "answer": "B", "subject": "IQ"},
+        {"question": "Find the odd one out: Cat, Dog, Apple, Cow",
+         "choices": ["A. Cat", "B. Dog", "C. Apple", "D. Cow"], "answer": "C", "subject": "IQ"},
+        {"question": "What number should come next: 2, 4, 6, ?",
+         "choices": ["A. 7", "B. 8", "C. 9", "D. 10"], "answer": "B", "subject": "IQ"},
     ],
 
     # ------------------------------------------------------------------ #
@@ -98,6 +104,12 @@ QUESTIONS: dict[str, list[dict]] = {
          "choices": ["A. 6", "B. 7", "C. 8", "D. 9"], "answer": "C", "subject": "Math"},
         {"question": "What planet is known as the Red Planet?",
          "choices": ["A. Jupiter", "B. Saturn", "C. Venus", "D. Mars"], "answer": "D", "subject": "Science"},
+        {"question": "Which number does not belong: 3, 6, 9, 11?",
+         "choices": ["A. 3", "B. 6", "C. 9", "D. 11"], "answer": "D", "subject": "IQ"},
+        {"question": "If all bloops are razzies and all razzies are lazzies, all bloops are:",
+         "choices": ["A. Not lazzies", "B. Lazzies", "C. Only razzies", "D. Animals"], "answer": "B", "subject": "IQ"},
+        {"question": "What comes next: A, C, E, G, ?",
+         "choices": ["A. H", "B. I", "C. J", "D. K"], "answer": "B", "subject": "IQ"},
     ],
 
     # ------------------------------------------------------------------ #
@@ -145,6 +157,12 @@ QUESTIONS: dict[str, list[dict]] = {
          "choices": ["A. 30,000", "B. 300,000", "C. 3,000,000", "D. 30,000,000"], "answer": "B", "subject": "Science"},
         {"question": "What is 20% of 250?",
          "choices": ["A. 40", "B. 50", "C. 60", "D. 25"], "answer": "B", "subject": "Math"},
+        {"question": "Which number continues the pattern: 1, 1, 2, 3, 5, 8, ?",
+         "choices": ["A. 10", "B. 11", "C. 13", "D. 15"], "answer": "C", "subject": "IQ"},
+        {"question": "A clock shows 3:15. What is the angle between hour and minute hands (smallest)?",
+         "choices": ["A. 0 degrees", "B. 7.5 degrees", "C. 15 degrees", "D. 30 degrees"], "answer": "B", "subject": "IQ"},
+        {"question": "Find the odd one out: Square, Triangle, Circle, Cube",
+         "choices": ["A. Square", "B. Triangle", "C. Circle", "D. Cube"], "answer": "D", "subject": "IQ"},
     ],
 
     # ------------------------------------------------------------------ #
@@ -200,6 +218,12 @@ QUESTIONS: dict[str, list[dict]] = {
          "answer": "B", "subject": "History"},
         {"question": "What is the value of sin(90°)?",
          "choices": ["A. 0", "B. 0.5", "C. √2/2", "D. 1"], "answer": "D", "subject": "Math"},
+        {"question": "If BOOK is coded as CPPL, TREE is coded as USFF. STAR is coded as:",
+         "choices": ["A. TUBS", "B. TUBR", "C. TUAS", "D. RUAS"], "answer": "A", "subject": "IQ"},
+        {"question": "Which is the next number: 2, 6, 12, 20, 30, ?",
+         "choices": ["A. 36", "B. 40", "C. 42", "D. 44"], "answer": "C", "subject": "IQ"},
+        {"question": "A is taller than B, B is taller than C. Who is shortest?",
+         "choices": ["A. A", "B. B", "C. C", "D. Cannot tell"], "answer": "C", "subject": "IQ"},
     ],
 
     # ------------------------------------------------------------------ #
@@ -260,5 +284,11 @@ QUESTIONS: dict[str, list[dict]] = {
          "answer": "B", "subject": "Science"},
         {"question": "Solve: log₂(64) = ?",
          "choices": ["A. 4", "B. 5", "C. 6", "D. 8"], "answer": "C", "subject": "Math"},
+        {"question": "Which number should replace ?: 3, 9, 27, 81, ?",
+         "choices": ["A. 162", "B. 243", "C. 324", "D. 729"], "answer": "B", "subject": "IQ"},
+        {"question": "If some artists are teachers and all teachers are readers, which is always true?",
+         "choices": ["A. All artists are readers", "B. Some readers are artists", "C. No artists are readers", "D. All readers are teachers"], "answer": "B", "subject": "IQ"},
+        {"question": "Find the odd one out: 8, 27, 64, 100, 125",
+         "choices": ["A. 8", "B. 27", "C. 100", "D. 125"], "answer": "C", "subject": "IQ"},
     ],
 }

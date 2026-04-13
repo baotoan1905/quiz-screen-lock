@@ -100,6 +100,9 @@ class AdminPanel(QDialog):
         self._lock_startup_cb = QCheckBox("Lock screen on application startup")
         form_misc.addRow(self._lock_startup_cb)
 
+        self._start_windows_cb = QCheckBox("Start QuizLock when Windows starts")
+        form_misc.addRow(self._start_windows_cb)
+
         root.addWidget(grp_misc)
 
         # --- Change password --------------------------------------------
@@ -131,6 +134,7 @@ class AdminPanel(QDialog):
         self._daily_spin.setValue(self._config.daily_screen_minutes)
         self._reward_spin.setValue(self._config.minutes_per_correct)
         self._lock_startup_cb.setChecked(self._config.lock_on_startup)
+        self._start_windows_cb.setChecked(self._config.start_with_windows)
 
     def _save_and_accept(self) -> None:
         self._config.grade_band = self._grade_combo.currentData()
@@ -138,6 +142,7 @@ class AdminPanel(QDialog):
         self._config.daily_screen_minutes = self._daily_spin.value()
         self._config.minutes_per_correct = self._reward_spin.value()
         self._config.lock_on_startup = self._lock_startup_cb.isChecked()
+        self._config.start_with_windows = self._start_windows_cb.isChecked()
         self._config.save()
         self.accept()
 

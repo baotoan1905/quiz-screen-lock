@@ -135,15 +135,32 @@ class QuizEngine(QWidget):
         btn.clicked.connect(lambda _, l=letter: self._on_answer(l))
         return btn
 
+    def _normalized_subject(self, raw_subject: str) -> str:
+        subject = raw_subject.strip()
+        lowered = subject.lower()
+        if lowered in {"language", "literature", "reading", "grammar", "vocabulary", "english"}:
+            return "English"
+        return subject
+
     # ------------------------------------------------------------------
     def _load_question(self) -> None:
-        """Pick a random question from the configured grade band."""
+        """Pick a random question from the configured grade band.
+
+        Selection is balanced by subject so Math/Science do not dominate
+        when a band also contains English questions.
+        """
         band = self._config.grade_band
         pool = QUESTIONS.get(band, QUESTIONS["grade_5_6"])
-        q = random.choice(pool)
+        by_subject: dict[str, list[dict]] = {}
+        for item in pool:
+            subject = self._normalized_subject(str(item.get("subject", "General")))
+            by_subject.setdefault(subject, []).append(item)
+
+        chosen_subject = random.choice(list(by_subject.keys()))
+        q = random.choice(by_subject[chosen_subject])
 
         self._current_answer = q["answer"]
-        self._subject_label.setText(q["subject"].upper())
+        self._subject_label.setText(chosen_subject.upper())
         self._question_label.setText(q["question"])
 
         for btn, choice in zip(

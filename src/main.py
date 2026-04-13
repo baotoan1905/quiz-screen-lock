@@ -9,6 +9,7 @@ Starts a PyQt6 application with:
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 from typing import Optional
 
 from PyQt6.QtCore import QTimer, Qt
@@ -24,6 +25,31 @@ from admin_panel import AdminPanel, prompt_admin_password
 from config import Config
 from lock_screen import LockScreen
 from timer_widget import TimerWidget
+
+APP_STARTUP_NAME = "QuizLock"
+
+
+def _startup_command() -> str:
+    if getattr(sys, "frozen", False):
+        return f'"{sys.executable}"'
+    script_path = Path(__file__).resolve()
+    return f'"{sys.executable}" "{script_path}"'
+
+
+def apply_startup_setting(enabled: bool) -> None:
+    if sys.platform != "win32":
+        return
+    import winreg
+
+    run_key = r"Software\Microsoft\Windows\CurrentVersion\Run"
+    with winreg.OpenKey(winreg.HKEY_CURRENT_USER, run_key, 0, winreg.KEY_SET_VALUE) as key:
+        if enabled:
+            winreg.SetValueEx(key, APP_STARTUP_NAME, 0, winreg.REG_SZ, _startup_command())
+        else:
+            try:
+                winreg.DeleteValue(key, APP_STARTUP_NAME)
+            except FileNotFoundError:
+                pass
 
 
 # ---------------------------------------------------------------------------
@@ -88,6 +114,10 @@ class ScreenTimeManager:
             self._tray.setToolTip("QuizLock — LOCKED")
             self._lock_screen.show_lock()
 
+    @property
+    def is_locked(self) -> bool:
+        return self._locked
+
     # ------------------------------------------------------------------
     def _on_time_expired(self) -> None:
         self._tray.showMessage(
@@ -113,13 +143,22 @@ class ScreenTimeManager:
 
     def _on_unlocked(self, minutes: int) -> None:
         self._locked = False
-        self._timer_widget.add_time(minutes * 60)
+        if minutes > 0:
+            # After a successful quiz while locked, allow only the earned window.
+            self._timer_widget.set_remaining(minutes * 60)
+        elif self._timer_widget.remaining_seconds <= 0:
+            # Admin bypass from lock screen should not immediately relock.
+            self._timer_widget.set_remaining(self._config.daily_screen_minutes * 60)
         self._timer_widget.resume()
         self._tray.setIcon(_make_tray_icon(locked=False))
         self._tray.setToolTip("QuizLock — running")
+        if minutes > 0:
+            msg = f"Unlocked! +{minutes} minutes added to your screen-time budget."
+        else:
+            msg = "Unlocked with admin access."
         self._tray.showMessage(
             "QuizLock",
-            f"Unlocked! +{minutes} minutes added to your screen-time budget.",
+            msg,
             QSystemTrayIcon.MessageIcon.Information,
             3000,
         )
@@ -142,6 +181,12 @@ class QuizLockApp:
             self._timer_widget,
             self._tray,
         )
+
+        # Keep OS startup registration in sync with saved preference.
+        try:
+            apply_startup_setting(self._config.start_with_windows)
+        except OSError:
+            pass
 
     # ------------------------------------------------------------------
     def _build_tray(self) -> QSystemTrayIcon:
@@ -171,6 +216,13 @@ class QuizLockApp:
         self._manager.lock_now()
 
     def _on_settings(self) -> None:
+        if self._manager.is_locked:
+            QMessageBox.warning(
+                None,
+                "QuizLock",
+                "Settings are disabled while the screen is locked.",
+            )
+            return
         if not prompt_admin_password(self._config):
             return
         dlg = AdminPanel(self._config)
@@ -178,8 +230,25 @@ class QuizLockApp:
             # Apply new budget if changed
             new_secs = self._config.daily_screen_minutes * 60
             self._timer_widget.set_remaining(new_secs)
+            try:
+                apply_startup_setting(self._config.start_with_windows)
+            except OSError as exc:
+                QMessageBox.warning(
+                    None,
+                    "QuizLock",
+                    f"Could not update Windows startup setting: {exc}",
+                )
 
     def _on_quit(self) -> None:
+        if self._manager.is_locked:
+            QMessageBox.warning(
+                None,
+                "QuizLock",
+                "Cannot quit while locked. Solve the quiz to unlock first.",
+            )
+            return
+        if not prompt_admin_password(self._config):
+            return
         reply = QMessageBox.question(
             None,
             "Quit QuizLock",

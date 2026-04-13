@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (
 )
 
 from config import Config
+from admin_panel import AdminPanel, prompt_admin_password
 from quiz_engine import QuizEngine
 import keyboard_hook
 
@@ -97,6 +98,20 @@ class LockScreen(QWidget):
         sub.setStyleSheet("color: #CCCCCC; font-size: 15px; margin-bottom: 20px;")
         layout.addWidget(sub)
 
+        admin_btn = QPushButton("Parent/Admin Access")
+        admin_btn.setFixedWidth(220)
+        admin_btn.setStyleSheet(
+            "QPushButton {"
+            "background: rgba(255,255,255,0.12); color: #FFFFFF;"
+            "border: 1px solid rgba(255,255,255,0.35); border-radius: 8px;"
+            "padding: 8px 12px; font-size: 13px;"
+            "}"
+            "QPushButton:hover { background: rgba(120,170,255,0.35); }"
+        )
+        admin_btn.clicked.connect(self._on_admin_access)
+        layout.addWidget(admin_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
+        layout.addSpacing(16)
+
         # Quiz widget (centred, max 700 px wide)
         self._quiz = QuizEngine(self._config, self)
         self._quiz.setMaximumWidth(720)
@@ -147,3 +162,13 @@ class LockScreen(QWidget):
         self.hide()
         self._clear_secondary_blockers()
         self.unlocked.emit(minutes)
+
+    def _on_admin_access(self) -> None:
+        if not prompt_admin_password(self._config, self):
+            return
+        dlg = AdminPanel(self._config, self)
+        dlg.exec()
+        keyboard_hook.unlock()
+        self.hide()
+        self._clear_secondary_blockers()
+        self.unlocked.emit(0)
