@@ -1,0 +1,10 @@
+IMPORTANT DISCLAIMER
+
+This software is provided "as is", without warranty of any kind.
+
+By continuing with this installation, you agree that:
+- You are responsible for using this application in compliance with local laws and organizational policies.
+- The authors are not liable for any direct or indirect damages resulting from use or misuse.
+- You have reviewed the LICENSE terms included with this package.
+
+Click Next to continue only if you accept these conditions.

@@ -28,9 +28,11 @@ class LockScreen(QWidget):
 
     Signals:
         unlocked(int)  — emitted with minutes_awarded when quiz passed
+        question_reward_changed(int, str) — emitted when current question reward changes
     """
 
     unlocked = pyqtSignal(int)
+    question_reward_changed = pyqtSignal(int, str)
 
     def __init__(self, config: Config, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
@@ -116,6 +118,7 @@ class LockScreen(QWidget):
         self._quiz = QuizEngine(self._config, self)
         self._quiz.setMaximumWidth(720)
         self._quiz.quiz_passed.connect(self._on_quiz_passed)
+        self._quiz.question_reward_changed.connect(self._on_question_reward_changed)
 
         # Wrap in a centering layout
         from PyQt6.QtWidgets import QHBoxLayout
@@ -162,6 +165,9 @@ class LockScreen(QWidget):
         self.hide()
         self._clear_secondary_blockers()
         self.unlocked.emit(minutes)
+
+    def _on_question_reward_changed(self, minutes: int, difficulty: str) -> None:
+        self.question_reward_changed.emit(minutes, difficulty)
 
     def _on_admin_access(self) -> None:
         if not prompt_admin_password(self._config, self):

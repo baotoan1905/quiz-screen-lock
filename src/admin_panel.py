@@ -87,10 +87,20 @@ class AdminPanel(QDialog):
         self._daily_spin.setSuffix(" minutes / day")
         form_time.addRow("Daily Budget:", self._daily_spin)
 
-        self._reward_spin = QSpinBox()
-        self._reward_spin.setRange(1, 60)
-        self._reward_spin.setSuffix(" minutes per correct answer")
-        form_time.addRow("Reward per Correct:", self._reward_spin)
+        self._easy_reward_spin = QSpinBox()
+        self._easy_reward_spin.setRange(1, 120)
+        self._easy_reward_spin.setSuffix(" min")
+        form_time.addRow("Easy Question Reward:", self._easy_reward_spin)
+
+        self._moderate_reward_spin = QSpinBox()
+        self._moderate_reward_spin.setRange(1, 120)
+        self._moderate_reward_spin.setSuffix(" min")
+        form_time.addRow("Moderate Question Reward:", self._moderate_reward_spin)
+
+        self._difficult_reward_spin = QSpinBox()
+        self._difficult_reward_spin.setRange(1, 120)
+        self._difficult_reward_spin.setSuffix(" min")
+        form_time.addRow("Difficult Question Reward:", self._difficult_reward_spin)
 
         root.addWidget(grp_time)
 
@@ -137,7 +147,10 @@ class AdminPanel(QDialog):
                 break
         self._req_spin.setValue(self._config.questions_required_to_unlock)
         self._daily_spin.setValue(self._config.daily_screen_minutes)
-        self._reward_spin.setValue(self._config.minutes_per_correct)
+        rewards = self._config.minutes_per_difficulty
+        self._easy_reward_spin.setValue(rewards["easy"])
+        self._moderate_reward_spin.setValue(rewards["moderate"])
+        self._difficult_reward_spin.setValue(rewards["difficult"])
         self._lock_startup_cb.setChecked(self._config.lock_on_startup)
         self._start_windows_cb.setChecked(self._config.start_with_windows)
 
@@ -145,7 +158,11 @@ class AdminPanel(QDialog):
         self._config.grade_band = self._grade_combo.currentData()
         self._config.questions_required_to_unlock = self._req_spin.value()
         self._config.daily_screen_minutes = self._daily_spin.value()
-        self._config.minutes_per_correct = self._reward_spin.value()
+        self._config.minutes_per_difficulty = {
+            "easy": self._easy_reward_spin.value(),
+            "moderate": self._moderate_reward_spin.value(),
+            "difficult": self._difficult_reward_spin.value(),
+        }
         self._config.lock_on_startup = self._lock_startup_cb.isChecked()
         self._config.start_with_windows = self._start_windows_cb.isChecked()
         self._config.save()

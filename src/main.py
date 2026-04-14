@@ -95,12 +95,14 @@ class ScreenTimeManager:
 
         # Set initial budget
         budget_secs = config.daily_screen_minutes * 60
+        self._timer_widget.set_budget(budget_secs)
         self._timer_widget.set_remaining(budget_secs)
 
         # Wire signals
         self._timer_widget.time_expired.connect(self._on_time_expired)
         self._timer_widget.tick.connect(self._on_tick)
         self._lock_screen.unlocked.connect(self._on_unlocked)
+        self._lock_screen.question_reward_changed.connect(self._on_question_reward_changed)
 
     # ------------------------------------------------------------------
     def start(self) -> None:
@@ -162,6 +164,9 @@ class ScreenTimeManager:
             QSystemTrayIcon.MessageIcon.Information,
             3000,
         )
+
+    def _on_question_reward_changed(self, minutes: int, difficulty: str) -> None:
+        self._timer_widget.set_current_question_reward(minutes, difficulty)
 
 
 # ---------------------------------------------------------------------------
@@ -229,6 +234,7 @@ class QuizLockApp:
         if dlg.exec():
             # Apply new budget if changed
             new_secs = self._config.daily_screen_minutes * 60
+            self._timer_widget.set_budget(new_secs)
             self._timer_widget.set_remaining(new_secs)
             try:
                 apply_startup_setting(self._config.start_with_windows)

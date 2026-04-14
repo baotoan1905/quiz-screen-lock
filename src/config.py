@@ -17,6 +17,11 @@ DEFAULTS: dict[str, Any] = {
     "grade_band": "grade_5_6",          # which question pool to draw from
     "daily_screen_minutes": 60,         # total screen-time budget per day
     "minutes_per_correct": 5,           # screen time awarded per correct answer
+    "minutes_per_difficulty": {
+        "easy": 3,
+        "moderate": 5,
+        "difficult": 8,
+    },
     "questions_required_to_unlock": 1,  # correct answers needed to unlock once
     "lock_on_startup": False,
     "start_with_windows": False,
@@ -46,6 +51,22 @@ class Config:
                 self._data.update(stored)
             except (json.JSONDecodeError, OSError):
                 pass  # keep defaults
+
+        # Backward-compatible migration: old configs may only have minutes_per_correct.
+        mpd = self._data.get("minutes_per_difficulty")
+        if not isinstance(mpd, dict):
+            legacy = int(self._data.get("minutes_per_correct", 5))
+            self._data["minutes_per_difficulty"] = {
+                "easy": max(1, legacy - 2),
+                "moderate": max(1, legacy),
+                "difficult": max(1, legacy + 3),
+            }
+        else:
+            self._data["minutes_per_difficulty"] = {
+                "easy": max(1, int(mpd.get("easy", 3))),
+                "moderate": max(1, int(mpd.get("moderate", 5))),
+                "difficult": max(1, int(mpd.get("difficult", 8))),
+            }
 
     def save(self) -> None:
         CONFIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -86,6 +107,26 @@ class Config:
     @minutes_per_correct.setter
     def minutes_per_correct(self, v: int) -> None:
         self._data["minutes_per_correct"] = max(1, v)
+
+    @property
+    def minutes_per_difficulty(self) -> dict[str, int]:
+        data = self._data.get("minutes_per_difficulty", {})
+        return {
+            "easy": max(1, int(data.get("easy", 3))),
+            "moderate": max(1, int(data.get("moderate", 5))),
+            "difficult": max(1, int(data.get("difficult", 8))),
+        }
+
+    @minutes_per_difficulty.setter
+    def minutes_per_difficulty(self, value: dict[str, int]) -> None:
+        self._data["minutes_per_difficulty"] = {
+            "easy": max(1, int(value.get("easy", 3))),
+            "moderate": max(1, int(value.get("moderate", 5))),
+            "difficult": max(1, int(value.get("difficult", 8))),
+        }
+
+    def minutes_for_difficulty(self, difficulty: str) -> int:
+        return self.minutes_per_difficulty.get(difficulty, self.minutes_per_difficulty["moderate"])
 
     @property
     def questions_required_to_unlock(self) -> int:
