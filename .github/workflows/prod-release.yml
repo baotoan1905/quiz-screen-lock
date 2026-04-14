@@ -13,12 +13,12 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
       - name: Get next version
         id: version
         shell: bash
         run: |
-          latest=$(git tag --sort=-v:refname | grep '^v' | head -1)
+          latest=$(git tag -l 'v*' --sort=-v:refname | head -n 1)
           if [ -z "$latest" ]; then
             echo "tag=v1.0.0" >> $GITHUB_OUTPUT
           else
